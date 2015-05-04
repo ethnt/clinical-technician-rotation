@@ -10,9 +10,11 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
+import javax.swing.JOptionPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
@@ -23,11 +25,14 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.JScrollPane;
+
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.RowSpec;
 import com.jgoodies.forms.factories.FormFactory;
+
 import java.awt.Font;
+
 import javax.swing.JList;
 import javax.swing.JFormattedTextField;
 import javax.swing.AbstractListModel;
@@ -58,6 +63,10 @@ public class TurkeltaubClinicalFrame extends JFrame {
 	private final JList listWeek = new JList();
 	private final JScrollPane scrollPane_1 = new JScrollPane();
 	private final JButton btnSave = new JButton("Save");
+	private final JButton btnDeleteSelected = new JButton("Delete Selected");
+	private final JButton btnSelectAll = new JButton("Select All");
+	private final JButton btnDeselectAll = new JButton("Deselect All");
+	private final JLabel lblClinicalTechnicianRotation = new JLabel("Clinical Technician Rotation Program");
 
 	/**
 	 * Launch the application.
@@ -129,6 +138,12 @@ public class TurkeltaubClinicalFrame extends JFrame {
 				"Hospital", "Week", "Lab Name", "Length"
 			}
 		) {
+			Class[] columnTypes = new Class[] {
+				String.class, Integer.class, String.class, Integer.class
+			};
+			public Class getColumnClass(int columnIndex) {
+				return columnTypes[columnIndex];
+			}
 			boolean[] columnEditables = new boolean[] {
 				false, false, false, false
 			};
@@ -136,20 +151,21 @@ public class TurkeltaubClinicalFrame extends JFrame {
 				return columnEditables[column];
 			}
 		});
-		
 		currentLabsTable.getColumnModel().getColumn(0).setPreferredWidth(215);
 		currentLabsTable.getColumnModel().getColumn(2).setPreferredWidth(325);
 		lblLabsFound.setBounds(456, 77, 146, 26);
 		
 		contentPane.add(lblLabsFound);
-		panel.setBounds(21, 111, 414, 631);
+		panel.setBounds(21, 111, 426, 631);
 		
 		contentPane.add(panel);
 		panel.setLayout(new FormLayout(new ColumnSpec[] {
 				FormFactory.RELATED_GAP_COLSPEC,
 				FormFactory.DEFAULT_COLSPEC,
 				FormFactory.RELATED_GAP_COLSPEC,
-				ColumnSpec.decode("default:grow"),},
+				ColumnSpec.decode("max(47dlu;default)"),
+				FormFactory.RELATED_GAP_COLSPEC,
+				ColumnSpec.decode("max(43dlu;default)"),},
 			new RowSpec[] {
 				FormFactory.RELATED_GAP_ROWSPEC,
 				FormFactory.DEFAULT_ROWSPEC,
@@ -157,6 +173,8 @@ public class TurkeltaubClinicalFrame extends JFrame {
 				FormFactory.DEFAULT_ROWSPEC,
 				FormFactory.RELATED_GAP_ROWSPEC,
 				RowSpec.decode("98dlu"),
+				FormFactory.RELATED_GAP_ROWSPEC,
+				FormFactory.DEFAULT_ROWSPEC,
 				FormFactory.RELATED_GAP_ROWSPEC,
 				FormFactory.DEFAULT_ROWSPEC,
 				FormFactory.RELATED_GAP_ROWSPEC,
@@ -169,7 +187,7 @@ public class TurkeltaubClinicalFrame extends JFrame {
 			}
 		});
 		
-		panel.add(comboBoxHospital, "4, 2, fill, default");
+		panel.add(comboBoxHospital, "4, 2, 3, 1, fill, default");
 		
 		panel.add(lblLabName, "2, 4, right, default");
 		comboBoxLabName.addActionListener(new ActionListener() {
@@ -179,12 +197,12 @@ public class TurkeltaubClinicalFrame extends JFrame {
 		});
 		comboBoxLabName.setModel(new DefaultComboBoxModel(new String[] {"All", "Hematology", "Blood Bank", "Clinical Chemistry", "Clinical Microbiology", "Urinalysis", "Outpatient Phlebotomy", "Inpatient Phlebotomy"}));
 		
-		panel.add(comboBoxLabName, "4, 4, fill, default");
+		panel.add(comboBoxLabName, "4, 4, 3, 1, fill, default");
 		lblWeek.setHorizontalAlignment(SwingConstants.RIGHT);
 		
 		panel.add(lblWeek, "2, 6");
 		
-		panel.add(scrollPane_1, "4, 6, fill, fill");
+		panel.add(scrollPane_1, "4, 6, 3, 1, fill, fill");
 		listWeek.setEnabled(false);
 		listWeek.setModel(new AbstractListModel() {
 			String[] values = new String[] {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24"};
@@ -196,11 +214,25 @@ public class TurkeltaubClinicalFrame extends JFrame {
 			}
 		});
 		scrollPane_1.setViewportView(listWeek);
+		btnSelectAll.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				do_btnSelectAll_actionPerformed(e);
+			}
+		});
 		
-		panel.add(lblLength, "2, 8, right, default");
+		panel.add(btnSelectAll, "4, 8");
+		btnDeselectAll.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				do_btnDeselectAll_actionPerformed(e);
+			}
+		});
+		
+		panel.add(btnDeselectAll, "6, 8");
+		
+		panel.add(lblLength, "2, 10, right, default");
 		formattedTextFieldLength.setEnabled(false);
 		
-		panel.add(formattedTextFieldLength, "4, 8, fill, default");
+		panel.add(formattedTextFieldLength, "4, 10, 3, 1, fill, default");
 		btnSave.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				do_btnSave_actionPerformed(e);
@@ -208,9 +240,22 @@ public class TurkeltaubClinicalFrame extends JFrame {
 		});
 		btnSave.setEnabled(false);
 		
-		panel.add(btnSave, "4, 10");
+		panel.add(btnSave, "4, 12");
 		
 		populateCurrentLabsTable();
+		btnDeleteSelected.setVisible(false);
+		btnDeleteSelected.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				do_btnDeleteSelected_actionPerformed(arg0);
+			}
+		});
+		btnDeleteSelected.setBounds(938, 77, 195, 26);
+		
+		contentPane.add(btnDeleteSelected);
+		lblClinicalTechnicianRotation.setFont(new Font("Tahoma", Font.BOLD, 21));
+		lblClinicalTechnicianRotation.setBounds(21, 77, 414, 26);
+		
+		contentPane.add(lblClinicalTechnicianRotation);
 	}
 	
 	public void populateCurrentHospital() {
@@ -284,7 +329,23 @@ public class TurkeltaubClinicalFrame extends JFrame {
 	}
 	
 	protected void do_btnSave_actionPerformed(ActionEvent e) {
-		// Error handling here!
+		if (comboBoxHospital.getSelectedItem().toString() == "All") {
+			JOptionPane.showMessageDialog(this, "You need to select a hospital.", "Select a Hospital", JOptionPane.ERROR_MESSAGE);
+			comboBoxHospital.grabFocus();
+			return;
+		}
+		
+		if (comboBoxLabName.getSelectedItem().toString() == "All") {
+			JOptionPane.showMessageDialog(this, "You need to select a lab name.", "Select a Lab Name", JOptionPane.ERROR_MESSAGE);
+			comboBoxLabName.grabFocus();
+			return;
+		}
+		
+		if (formattedTextFieldLength.getText().isEmpty()) {
+			JOptionPane.showMessageDialog(this, "You need to specify a length.", "Specify a Length", JOptionPane.ERROR_MESSAGE);
+			formattedTextFieldLength.grabFocus();
+			return;
+		}
 		
 		List<Integer> weeks = new ArrayList<Integer>();
 		
@@ -293,5 +354,22 @@ public class TurkeltaubClinicalFrame extends JFrame {
 		}
 
 		Lab.fromForm(comboBoxHospital.getSelectedItem().toString(), comboBoxLabName.getSelectedItem().toString(), weeks, formattedTextFieldLength.getText());
+		
+		populateCurrentLabsTable();
+	}
+	
+	protected void do_btnDeleteSelected_actionPerformed(ActionEvent arg0) {
+		
+	}
+	
+	protected void do_btnSelectAll_actionPerformed(ActionEvent e) {
+		int[] indices = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23};
+		
+		listWeek.setSelectedIndices(indices);
+	}
+	protected void do_btnDeselectAll_actionPerformed(ActionEvent e) {
+		int [] indices = {};
+		
+		listWeek.setSelectedIndices(indices);
 	}
 }

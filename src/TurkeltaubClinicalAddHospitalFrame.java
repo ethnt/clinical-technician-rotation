@@ -4,13 +4,17 @@ import java.awt.EventQueue;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.RowSpec;
 import com.jgoodies.forms.factories.FormFactory;
+
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.JButton;
+
 import java.awt.Font;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -107,6 +111,36 @@ public class TurkeltaubClinicalAddHospitalFrame extends JFrame {
 	}
 
 	protected void do_btnSave_actionPerformed(ActionEvent e) {
+		if (textFieldName.getText().isEmpty()) {
+			JOptionPane.showMessageDialog(this, "You need to specify a name.", "Specify a Name", JOptionPane.ERROR_MESSAGE);
+			textFieldName.grabFocus();
+			return;
+		}
+		
+		if (textFieldAddress.getText().isEmpty()) {
+			JOptionPane.showMessageDialog(this, "You need to specify an address.", "Specify an Address", JOptionPane.ERROR_MESSAGE);
+			textFieldAddress.grabFocus();
+			return;
+		}
+		
+		if (textFieldCity.getText().isEmpty()) {
+			JOptionPane.showMessageDialog(this, "You need to specify an city.", "Specify a City", JOptionPane.ERROR_MESSAGE);
+			textFieldCity.grabFocus();
+			return;
+		}
+		
+		if (textFieldState.getText().isEmpty()) {
+			JOptionPane.showMessageDialog(this, "You need to specify a state.", "Specify a State", JOptionPane.ERROR_MESSAGE);
+			textFieldState.grabFocus();
+			return;
+		}
+		
+		if (textFieldZip.getText().isEmpty()) {
+			JOptionPane.showMessageDialog(this, "You need to specify a zip.", "Specify a Zip", JOptionPane.ERROR_MESSAGE);
+			textFieldZip.grabFocus();
+			return;
+		}
+		
 		Hospital hospital = new Hospital(
 			textFieldName.getText(),
 			textFieldAddress.getText(),

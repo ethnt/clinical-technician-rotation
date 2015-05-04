@@ -150,7 +150,7 @@ public class Lab {
 			String removeOrStatement = null;
 			
 			for (Integer week : weeks) {
-				removeOrStatement += "Week = " + week + " OR ";
+				removeOrStatement += "WeekNumber = " + week + " OR ";
 			}
 			
 			removeOrStatement = removeOrStatement.substring(4, removeOrStatement.length() - 4);
@@ -164,7 +164,6 @@ public class Lab {
 				Connection conn = Lab.connection();
 				
 				statement = conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
-				
 				int resultInt = statement.executeUpdate(removeOrQuery);
 				
 				conn.commit();
@@ -352,10 +351,10 @@ public class Lab {
 	 */
 	public Object[] asArray() {
 		Object[] row = new Object[]{
-			lab_name,
+			hospital_name,
 			week_number,
-			length,
-			hospital_name
+			lab_name,
+			length
 		};
 
 		return row;
